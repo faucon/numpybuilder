@@ -88,6 +88,16 @@ def build_numpyfunc(f, variables, debug=False):
         sage: num_f(0,0)
         1.0
 
+    now the real advantage is that this function is able to process numpy arrays::
+
+        sage: import numpy as np
+        sage: xs, ys = np.meshgrid(np.linspace(0,2*n(pi)), np.linspace(0,2*n(pi)))
+        sage: num_f(xs, ys)
+        array([[ 1...
+        sage: num_f(xs,ys).shape
+        (50, 50)
+
+
     if it does not know something (either a variable or a symbolic function) an error is
     thrown::
 
