@@ -60,7 +60,7 @@ def build_numpy_expression(expression, variables, function_map=function_map, str
         else:
             raise BuilderError("unknown symbolic expression: " + str(expression))
 
-def build_numpyfunc(f, variables, debug=False):
+def build_numpyfunc(f, variables):
     r"""
     returns a function, which evaluates a sage symbolic expression numerically using
     numpy
@@ -79,7 +79,7 @@ def build_numpyfunc(f, variables, debug=False):
 
     EXAMPLES:
 
-    ::
+    lets create a numpy-function::
 
         sage: from sage.numpybuilder import build_numpyfunc
         sage: y = var('y')
@@ -88,7 +88,7 @@ def build_numpyfunc(f, variables, debug=False):
         sage: num_f(0,0)
         1.0
 
-    now the real advantage is that this function is able to process numpy arrays::
+    and you can process numpy arrays::
 
         sage: import numpy as np
         sage: xs, ys = np.meshgrid(np.linspace(0,2*n(pi)), np.linspace(0,2*n(pi)))
@@ -98,7 +98,7 @@ def build_numpyfunc(f, variables, debug=False):
         (50, 50)
 
 
-    if it does not know something (either a variable or a symbolic function) an error is
+    if it doesn't know something (either a variable or a symbolic function) an error is
     thrown::
 
         sage: f = x + y
@@ -119,6 +119,4 @@ def build_numpyfunc(f, variables, debug=False):
     expression_string = "def npfunc(" + ",".join(variables) + "):\n"
     expression_string += "    return " + build_numpy_expression(f, variables)
     exec(expression_string)
-    if debug:
-        print expression_string
     return npfunc
