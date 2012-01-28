@@ -15,6 +15,17 @@ string_map = {
     "-I": "-1j",
 }
 
+def log_builder(operands, variables, function_map=function_map, string_map=string_map):
+    r"""
+    build from a sage-log-expression a python expression (as string) that uses numpy log
+    """
+    if len(operands)==1:
+        return "numpy.lib.scimath.log(" + build_numpy_expression(operands[0], variables,
+                function_map, string_map) + ")"
+    if len(operands)==2:
+        #change order of operands, because numpy wants base first
+        return "numpy.lib.scimath.logn(" + ", ".join([build_numpy_expression(t, variables, function_map, string_map) for t in (operands[1], operands[0])]) + ")"
+
 def function_builder(function_name):
     r"""
     expression builder for function calls
@@ -32,9 +43,19 @@ def operator_builder(operator_string):
     return b
 
 function_map = {
-    sagefuncs.sin: function_builder("numpy.sin"),
+    sagefuncs.abs_symbolic: function_builder("numpy.abs"),
+    sagefuncs.arccos: function_builder("numpy.lib.scimath.arccos"),
+    sagefuncs.arccosh: function_builder("numpy.arccosh"),
+    sagefuncs.arcsin: function_builder("numpy.lib.scimath.arcsin"),
+    sagefuncs.arcsinh: function_builder("numpy.arcsinh"),
+    sagefuncs.arctan: function_builder("numpy.arctan"),
+    sagefuncs.arctanh: function_builder("numpy.lib.scimath.arctanh"),
     sagefuncs.cos: function_builder("numpy.cos"),
     sagefuncs.exp: function_builder("numpy.exp"),
+    sagefuncs.ln: function_builder("numpy.lib.scimath.log"),
+    sagefuncs.sin: function_builder("numpy.sin"),
+    sagefuncs.sqrt: function_builder("numpy.lib.scimath.sqrt"),
+
     operator.pow: function_builder("numpy.lib.scimath.power"), #special sqrt working with complex numbers
     operator.add: operator_builder(" + "),
     operator.sub: operator_builder(" - "),
@@ -97,6 +118,20 @@ def build_numpyfunc(f, variables):
         sage: num_f(xs,ys).shape
         (50, 50)
 
+
+    TESTS:
+    some other supported functions::
+
+        sage: f = log(x, 4)
+        sage: num_f = build_numpyfunc(f, ['x'])
+        sage: num_f(5) - n(f(x=5))
+        0.0
+        sage: f = abs(x) + e^x + sqrt(x)
+        sage: num_f = build_numpyfunc(f, ['x'])
+        sage: num_f(3.4) - n(f(x=3.4))
+        0.0
+        sage: f = arccos(x) + arccosh(x) + arcsin(x) + arcsinh(x) + arctan(x) + arctanh(x)
+        sage: num_f = build_numpyfunc(f, ['x']) #does not raise an exception should be enough for now
 
     if it doesn't know something (either a variable or a symbolic function) an error is
     thrown::
