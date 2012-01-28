@@ -15,17 +15,6 @@ string_map = {
     "-I": "-1j",
 }
 
-def log_builder(operands, variables, function_map=function_map, string_map=string_map):
-    r"""
-    build from a sage-log-expression a python expression (as string) that uses numpy log
-    """
-    if len(operands)==1:
-        return "numpy.lib.scimath.log(" + build_numpy_expression(operands[0], variables,
-                function_map, string_map) + ")"
-    if len(operands)==2:
-        #change order of operands, because numpy wants base first
-        return "numpy.lib.scimath.logn(" + ", ".join([build_numpy_expression(t, variables, function_map, string_map) for t in (operands[1], operands[0])]) + ")"
-
 def function_builder(function_name):
     r"""
     expression builder for function calls
